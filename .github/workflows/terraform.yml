@@ -24,7 +24,7 @@ jobs:
       id: plan-test
       run: |
         terraform init
-        terraform plan -var-file=../../environments/test.tfvars -out=plan-test
+        terraform plan -var-file=environments/test.tfvars -out=plan-test
         terraform show -no-color plan-test > plan-test.txt
       
     - name: Upload Terraform Plan Artifact for Test
@@ -62,7 +62,7 @@ jobs:
       - name: Terraform Plan for Dev
         run: |
           terraform init
-          terraform plan -var-file=../../environments/dev.tfvars -out=plan-dev
+          terraform plan -var-file=environments/dev.tfvars -out=plan-dev
           terraform show -no-color plan-dev > plan-dev.txt
       - uses: actions/upload-artifact@v2
         with:
@@ -91,7 +91,7 @@ jobs:
       - name: Terraform Plan for Prod
         run: |
           terraform init
-          terraform plan -var-file=../../environments/prod.tfvars -out=plan-prod
+          terraform plan -var-file=environments/prod.tfvars -out=plan-prod
           terraform show -no-color plan-prod > plan-prod.txt
       - uses: actions/upload-artifact@v2
         with:
