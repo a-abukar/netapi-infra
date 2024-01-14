@@ -26,7 +26,7 @@ module "ecs" {
   service_name      = var.ecs_service_name
   subnets           = module.network.public_subnet_ids
   security_group_id = aws_security_group.ecs_sg.id
-  desired_count     = var.ecs_desired_count
+  desired_count     = var.ecs_desired_count 
 }
 
 # RDS Modules
