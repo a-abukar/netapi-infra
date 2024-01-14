@@ -1,0 +1,130 @@
+name: 'Terraform CI/CD'
+
+on:
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+env:
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_DEFAULT_REGION: 'us-west-2'
+
+jobs:
+  terraform_plan_test:
+    name: 'Terraform Plan for Test'
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Terraform Plan for Test
+      id: plan-test
+      run: |
+        terraform init
+        terraform plan -var-file=environments/test.tfvars -out=plan-test
+        terraform show -no-color plan-test > plan-test.txt
+      
+    - name: Upload Terraform Plan Artifact for Test
+      if: github.event_name == 'pull_request'
+      uses: actions/upload-artifact@v2
+      with:
+        name: plan-test
+        path: plan-test
+    
+    - name: Read Terraform Plan Output for Test
+      if: github.event_name == 'pull_request'
+      run: |
+        echo "PLAN_TEST<<EOF" >> $GITHUB_ENV
+        cat plan-test.txt >> $GITHUB_ENV
+        echo "EOF" >> $GITHUB_ENV
+
+    - name: Comment Test Plan Output on PR
+      if: github.event_name == 'pull_request'
+      uses: thollander/actions-comment-pull-request@v1
+      with:
+        message: |
+          Terraform Test Plan Output:
+          ```
+          ${{ env.PLAN_TEST }}
+          ```
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  terraform_plan_dev:
+    name: 'Terraform Plan for Dev'
+    runs-on: ubuntu-latest
+    needs: terraform_plan_test
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v2
+      - name: Terraform Plan for Dev
+        run: |
+          terraform init
+          terraform plan -var-file=environments/dev.tfvars -out=plan-dev
+          terraform show -no-color plan-dev > plan-dev.txt
+      - uses: actions/upload-artifact@v2
+        with:
+          name: plan-dev
+          path: plan-dev
+      - run: |
+          echo "PLAN_DEV<<EOF" >> $GITHUB_ENV
+          cat plan-dev.txt >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+      - uses: thollander/actions-comment-pull-request@v1
+        with:
+          message: |
+            Terraform Dev Plan Output:
+            ```
+            ${{ env.PLAN_DEV }}
+            ```
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  terraform_plan_prod:
+    name: 'Terraform Plan for Prod'
+    runs-on: ubuntu-latest
+    needs: terraform_plan_dev
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v2
+      - name: Terraform Plan for Prod
+        run: |
+          terraform init
+          terraform plan -var-file=environments/prod.tfvars -out=plan-prod
+          terraform show -no-color plan-prod > plan-prod.txt
+      - uses: actions/upload-artifact@v2
+        with:
+          name: plan-prod
+          path: plan-prod
+      - run: |
+          echo "PLAN_PROD<<EOF" >> $GITHUB_ENV
+          cat plan-prod.txt >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+      - uses: thollander/actions-comment-pull-request@v1
+        with:
+          message: |
+            Terraform Prod Plan Output:
+            ```
+            ${{ env.PLAN_PROD }}
+            ```
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  terraform_apply:
+    name: 'Terraform Apply'
+    runs-on: ubuntu-latest
+    needs: [terraform_plan_test, terraform_plan_dev, terraform_plan_prod]
+    if: github.event_name == 'workflow_dispatch'
+    steps:
+      - uses: actions/checkout@v2
+      - name: Download Terraform Plan Artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: plan-${{ github.event.inputs.environment }}
+      - name: Terraform Apply
+        run: terraform apply "plan-${{ github.event.inputs.environment }}"
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: 'us-west-2'
+
