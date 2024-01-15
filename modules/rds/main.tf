@@ -20,6 +20,8 @@ resource "aws_db_instance" "default" {
   publicly_accessible    = false
   skip_final_snapshot    = true
   iam_database_authentication_enabled = true
+  multi_az = true
+  enabled_cloudwatch_logs_exports = ["audit", "error", "general", "slowquery"]
 }
 
 resource "aws_db_subnet_group" "default" {
@@ -42,4 +44,20 @@ resource "aws_db_parameter_group" "default" {
   }
 }
 
+resource "aws_cloudwatch_metric_alarm" "rds_cpu_high" {
+  alarm_name = "rds-cpu-high-${var.rds_instance_identifier}"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods = 2
+  metric_name = "CPUUtilization"
+  namespace = "AWS/RDS" 
+  period = 60
+  statistic = "Average"
+  threshold = var.rds_cpu_utilization_high_threshold
 
+  dimensions = {
+    DBInstanceIdentifier = aws_db_instance.default.id
+  }
+
+  alarm_description = "This alarm fires when RDS CPU utilization exceeds ${var.rds_cpu_utilization_high_threshold} percent"
+  alarm_actions = [var.rds_cpu_utilization_alarm_action]
+}

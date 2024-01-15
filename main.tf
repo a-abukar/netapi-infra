@@ -27,6 +27,8 @@ module "ecs" {
   subnets           = module.network.public_subnet_ids
   security_group_id = aws_security_group.ecs_sg.id
   desired_count     = var.ecs_desired_count
+  alb_security_group_id = aws_security_group.alb_sg.id
+  alb_subnets           = module.network.public_subnet_ids
 }
 
 # RDS Modules
@@ -48,6 +50,25 @@ module "rds" {
 }
 
 
+resource "aws_security_group" "alb_sg" {
+  name        = "alb-security-group"
+  description = "Security group for ALB"
+  vpc_id      = module.network.vpc_id
+
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]  # Adjust as needed
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]  # Adjust as needed
+  }
+}
 
 
 # Security Groups for ECS

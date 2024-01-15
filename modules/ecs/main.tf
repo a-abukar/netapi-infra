@@ -1,5 +1,46 @@
+resource "aws_lb" "alb" {
+  name               = "${var.service_name}-alb"
+  internal           = false
+  load_balancer_type = "application"
+  security_groups    = [var.alb_security_group_id]
+  subnets            = var.alb_subnets
+
+  enable_deletion_protection = false
+}
+
+resource "aws_lb_target_group" "target_group" {
+  name     = "${var.service_name}-tg"
+  port     = var.container_port
+  protocol = "HTTP"
+  vpc_id   = module.network.vpc_id
+
+  health_check {
+    healthy_threshold   = 3
+    unhealthy_threshold = 3
+    timeout             = 5
+    interval            = 30
+    path                = "/"
+    matcher             = "200"
+  }
+}
+
+resource "aws_lb_listener" "listener" {
+  load_balancer_arn = aws_lb.alb.arn
+  port              = 80
+  protocol          = "HTTP"
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.target_group.arn
+  }
+}
+
 resource "aws_ecs_cluster" "cluster" {
   name = var.cluster_name
+}
+
+resource "aws_cloudwatch_log_group" "webapi_log_group" {
+  name = "ecs-webapi"
 }
 
 resource "aws_ecs_task_definition" "task" {
@@ -21,8 +62,34 @@ resource "aws_ecs_task_definition" "task" {
           hostPort      = var.container_port
         }
       ]
+      logConfiguration: {
+        logDriver: "awslogs",
+        options: {
+          awslogs-group: aws_cloudwatch_log_group.webapi_log_group.name,
+          awslogs-region: var.region,
+          awslogs-stream-prefix: "ecs"
+        }
+      }
     }
   ])
+}
+
+resource "aws_cloudwatch_metric_alarm" "ecs_cpu_high" {
+  alarm_name          = "ecs-cpu-high-${var.cluster_name}"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 2
+  metric_name         = "CPUUtilization"
+  namespace           = "AWS/ECS"
+  period              = 60
+  statistic           = "Average"
+  threshold           = var.cpu_utilization_high_threshold
+
+  dimensions = {
+    ClusterName = var.ecs_cluster_name
+  }
+
+  alarm_description = "This alarm fires when CPU utilization exceeds ${var.cpu_utilization_high_threshold} percent"
+  alarm_actions     = [var.cpu_utilization_alarm_action]
 }
 
 resource "aws_ecs_service" "service" {
@@ -37,6 +104,13 @@ resource "aws_ecs_service" "service" {
   }
 
   desired_count = var.desired_count
+
+  load_balancer {
+    target_group_arn = aws_lb_target_group.target_group.arn
+    container_name   = var.container_name
+    container_port   = var.container_port
+  }
+
 }
 
 resource "aws_iam_role" "ecs_execution_role" {

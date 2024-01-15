@@ -52,3 +52,23 @@ variable "desired_count" {
   description = "The desired number of instances of the task definition to run"
   type        = number
 }
+
+variable "alb_security_group_id" {
+  description = "The security group ID for the Application Load Balancer"
+  type        = string
+}
+
+variable "alb_subnets" {
+  description = "The subnets for the Application Load Balancer"
+  type        = list(string)
+}
+
+variable "cpu_utilization_high_threshold" {
+  description = "The CPU utilization percentage to trigger the high CPU alarm"
+  type        = number
+}
+
+variable "cpu_utilization_alarm_action" {
+  description = "ARN of the action to take when the high CPU alarm fires"
+  type        = string
+}
