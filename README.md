@@ -157,7 +157,7 @@ As you can see the module is also standardised (uses variables) - so you can dir
 - The GitHub Actions workflow will automatically run, executing `terraform plan`
 - `terraform apply` will run based on a manual trigger and specifying the environment you would like to deploy to
 - The diagram below shows the pipeline workflow:
-![Alt text]((terraform-pipeline-workflow.webp)
+![Alt text](terraform-pipeline-workflow.webp)
 
 
 ## Error Handling and Debugging
