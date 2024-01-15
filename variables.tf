@@ -145,11 +145,6 @@ variable "ecs_cpu_utilization_high_threshold" {
   type        = number
 }
 
-variable "ecs_cpu_utilization_alarm_action" {
-  description = "ARN of the action for ECS CPU utilization alarm"
-  type        = string
-}
-
 variable "rds_instance_identifier" {
   description = "Identifier for the RDS instance"
   type        = string
@@ -160,7 +155,3 @@ variable "rds_cpu_utilization_high_threshold" {
   type        = number
 }
 
-variable "rds_cpu_utilization_alarm_action" {
-  description = "ARN of the action for RDS CPU utilization alarm"
-  type        = string
-}
