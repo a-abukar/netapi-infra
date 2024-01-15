@@ -29,6 +29,7 @@ module "ecs" {
   desired_count     = var.ecs_desired_count
   alb_security_group_id = aws_security_group.alb_sg.id
   alb_subnets           = module.network.public_subnet_ids
+  cpu_utilization_high_threshold = var.ecs_cpu_utilization_high_threshold
 }
 
 # RDS Modules
@@ -47,6 +48,8 @@ module "rds" {
   db_parameter_family = var.rds_db_parameter_family
   subnet_ids          = module.network.private_subnet_ids
   security_group_id   = aws_security_group.rds_sg.id
+  rds_instance_identifier        = var.rds_instance_identifier
+  rds_cpu_utilization_high_threshold = var.rds_cpu_utilization_high_threshold
 }
 
 

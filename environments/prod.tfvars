@@ -17,6 +17,7 @@ ecs_container_image = "prod-docker-image:latest"
 ecs_container_port = 80
 ecs_service_name = "prod-service"
 ecs_desired_count = 2
+ecs_cpu_utilization_high_threshold = 80
 
 # RDS Configuration
 rds_allocated_storage = 20
@@ -28,3 +29,5 @@ rds_db_name = "proddatabase"
 rds_db_username = "prodadmin"
 rds_db_password = "prodsecurepassword"
 rds_db_parameter_family = "mysql5.7"
+rds_instance_identifier = "prod-rds-instance"
+rds_cpu_utilization_high_threshold = 85

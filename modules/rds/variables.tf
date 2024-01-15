@@ -63,7 +63,3 @@ variable "rds_cpu_utilization_high_threshold" {
   type        = number
 }
 
-variable "rds_cpu_utilization_alarm_action" {
-  description = "ARN of the action to take when the high CPU alarm for RDS fires"
-  type        = string
-}

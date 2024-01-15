@@ -44,6 +44,10 @@ resource "aws_db_parameter_group" "default" {
   }
 }
 
+resource "aws_sns_topic" "rds_alarm_topic" {
+  name = "rds-alarm-topic"
+}
+
 resource "aws_cloudwatch_metric_alarm" "rds_cpu_high" {
   alarm_name = "rds-cpu-high-${var.rds_instance_identifier}"
   comparison_operator = "GreaterThanThreshold"
@@ -59,5 +63,5 @@ resource "aws_cloudwatch_metric_alarm" "rds_cpu_high" {
   }
 
   alarm_description = "This alarm fires when RDS CPU utilization exceeds ${var.rds_cpu_utilization_high_threshold} percent"
-  alarm_actions = [var.rds_cpu_utilization_alarm_action]
+  alarm_actions = [aws_sns_topic.rds_alarm_topic.arn]
 }

@@ -1,3 +1,5 @@
+data "aws_caller_identity" "current" {}
+
 resource "aws_lb" "alb" {
   name               = "${var.service_name}-alb"
   internal           = false
@@ -74,6 +76,45 @@ resource "aws_ecs_task_definition" "task" {
   ])
 }
 
+resource "aws_appautoscaling_target" "ecs_target" {
+  max_capacity       = var.ecs_max_capacity
+  min_capacity       = var.ecs_min_capacity
+  resource_id        = "service/${var.cluster_name}/${aws_ecs_service.ecs_service.name}"
+  scalable_dimension = "ecs:service:DesiredCount"
+  service_namespace  = "ecs"
+}
+
+resource "aws_appautoscaling_policy" "ecs_scale_up" {
+  name               = "scale_up"
+  policy_type        = "TargetTrackingScaling"
+  resource_id        = aws_appautoscaling_target.ecs_target.resource_id
+  scalable_dimension = aws_appautoscaling_target.ecs_target.scalable_dimension
+  service_namespace  = aws_appautoscaling_target.ecs_target.service_namespace
+
+  target_tracking_scaling_policy_configuration {
+    target_value       = var.ecs_cpu_scale_up_threshold
+    predefined_metric_specification {
+      predefined_metric_type = "ECSServiceAverageCPUUtilization"
+    }
+  }
+}
+
+resource "aws_appautoscaling_policy" "ecs_scale_down" {
+  name               = "scale_down"
+  policy_type        = "TargetTrackingScaling"
+  resource_id        = aws_appautoscaling_target.ecs_target.resource_id
+  scalable_dimension = aws_appautoscaling_target.ecs_target.scalable_dimension
+  service_namespace  = aws_appautoscaling_target.ecs_target.service_namespace
+
+  target_tracking_scaling_policy_configuration {
+    target_value       = var.ecs_cpu_scale_down_threshold
+    predefined_metric_specification {
+      predefined_metric_type = "ECSServiceAverageCPUUtilization"
+    }
+  }
+}
+
+
 resource "aws_cloudwatch_metric_alarm" "ecs_cpu_high" {
   alarm_name          = "ecs-cpu-high-${var.cluster_name}"
   comparison_operator = "GreaterThanThreshold"
@@ -85,11 +126,13 @@ resource "aws_cloudwatch_metric_alarm" "ecs_cpu_high" {
   threshold           = var.cpu_utilization_high_threshold
 
   dimensions = {
-    ClusterName = var.ecs_cluster_name
+    ClusterName = var.cluster_name
   }
 
   alarm_description = "This alarm fires when CPU utilization exceeds ${var.cpu_utilization_high_threshold} percent"
-  alarm_actions     = [var.cpu_utilization_alarm_action]
+  alarm_actions     = [
+    "arn:aws:application-autoscaling:${var.region}:${data.aws_caller_identity.current.account_id}:scalableTarget/${aws_appautoscaling_target.ecs_target.resource_id}/scalablePolicy/${aws_appautoscaling_policy.ecs_scale_down.name}"
+    ]
 }
 
 resource "aws_ecs_service" "service" {

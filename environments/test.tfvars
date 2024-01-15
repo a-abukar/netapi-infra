@@ -17,6 +17,7 @@ ecs_container_image = "test-docker-image:latest"
 ecs_container_port = 80
 ecs_service_name = "test-service"
 ecs_desired_count = 1
+ecs_cpu_utilization_high_threshold = 50
 
 # RDS Configuration
 rds_allocated_storage = 10
@@ -28,3 +29,5 @@ rds_db_name = "testdatabase"
 rds_db_username = "testadmin"
 rds_db_password = "testsecurepassword"
 rds_db_parameter_family = "mysql5.7"
+rds_instance_identifier = "test-rds-instance"
+rds_cpu_utilization_high_threshold = 70

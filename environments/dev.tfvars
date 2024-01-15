@@ -17,6 +17,7 @@ ecs_container_image = "dev-docker-image:latest"
 ecs_container_port = 80
 ecs_service_name = "dev-service"
 ecs_desired_count = 1
+ecs_cpu_utilization_high_threshold = 60
 
 # RDS Configuration
 rds_allocated_storage = 10
@@ -28,3 +29,5 @@ rds_db_name = "devdatabase"
 rds_db_username = "devadmin"
 rds_db_password = "devsecurepassword"
 rds_db_parameter_family = "mysql5.7"
+rds_cpu_utilization_high_threshold = 75
+rds_instance_identifier = "dev-rds-instance"

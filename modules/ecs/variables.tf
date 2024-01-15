@@ -67,8 +67,3 @@ variable "cpu_utilization_high_threshold" {
   description = "The CPU utilization percentage to trigger the high CPU alarm"
   type        = number
 }
-
-variable "cpu_utilization_alarm_action" {
-  description = "ARN of the action to take when the high CPU alarm fires"
-  type        = string
-}
