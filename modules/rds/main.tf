@@ -1,6 +1,5 @@
 resource "aws_kms_key" "rds_encryption" {
   description = "KMS key for RDS encryption"
-  // Add any specific configurations for your KMS key here
 }
 
 resource "aws_db_instance" "default" {
