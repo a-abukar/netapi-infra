@@ -32,6 +32,10 @@ module "ecs" {
   alb_security_group_id = aws_security_group.alb_sg.id
   alb_subnets           = module.network.public_subnet_ids
   cpu_utilization_high_threshold = var.ecs_cpu_utilization_high_threshold
+  ecs_max_capacity = var.ecs_max_capacity
+  ecs_min_capacity = var.ecs_min_capacity
+  ecs_cpu_scale_up_threshold = var.ecs_cpu_scale_up_threshold
+  ecs_cpu_scale_down_threshold = var.ecs_cpu_scale_down_threshold
 }
 
 # RDS Modules
