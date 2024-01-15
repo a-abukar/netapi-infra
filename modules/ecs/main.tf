@@ -14,7 +14,8 @@ resource "aws_lb_target_group" "target_group" {
   name     = "${var.service_name}-tg"
   port     = var.container_port
   protocol = "HTTP"
-  vpc_id   = module.network.vpc_id
+  vpc_id = var.network_vpc_id
+
 
   health_check {
     healthy_threshold   = 3
@@ -79,7 +80,7 @@ resource "aws_ecs_task_definition" "task" {
 resource "aws_appautoscaling_target" "ecs_target" {
   max_capacity       = var.ecs_max_capacity
   min_capacity       = var.ecs_min_capacity
-  resource_id        = "service/${var.cluster_name}/${aws_ecs_service.ecs_service.name}"
+  resource_id        = "service/${var.cluster_name}/${aws_ecs_service.service.name}"
   scalable_dimension = "ecs:service:DesiredCount"
   service_namespace  = "ecs"
 }

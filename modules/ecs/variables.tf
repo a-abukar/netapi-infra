@@ -3,6 +3,12 @@ variable "cluster_name" {
   type        = string
 }
 
+variable "region" {
+  description = "AWS region for the ECS service"
+  type        = string
+}
+
+
 variable "task_family" {
   description = "The family of the ECS task"
   type        = string
@@ -66,4 +72,8 @@ variable "alb_subnets" {
 variable "cpu_utilization_high_threshold" {
   description = "The CPU utilization percentage to trigger the high CPU alarm"
   type        = number
+}
+
+variable "network_vpc_id" {
+  description = "The VPC ID where the service is deployed into"
 }

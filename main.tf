@@ -16,6 +16,8 @@ module "network" {
 module "ecs" {
   source = "./modules/ecs"
 
+  region = var.aws_region
+  network_vpc_id =   module.network.vpc_id
   cluster_name      = var.ecs_cluster_name
   task_family       = var.ecs_task_family
   task_cpu          = var.ecs_task_cpu
