@@ -18,6 +18,10 @@ ecs_container_port = 80
 ecs_service_name = "prod-service"
 ecs_desired_count = 2
 ecs_cpu_utilization_high_threshold = 80
+ecs_max_capacity = 10
+ecs_min_capacity = 1
+ecs_cpu_scale_up_threshold = 70
+ecs_cpu_scale_down_threshold = 20
 
 # RDS Configuration
 rds_allocated_storage = 20
