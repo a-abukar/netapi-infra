@@ -14,7 +14,7 @@ resource "aws_lb_target_group" "target_group" {
   name     = "${var.service_name}-tg"
   port     = var.container_port
   protocol = "HTTP"
-  vpc_id = var.network_vpc_id
+  vpc_id   = var.network_vpc_id
 
 
   health_check {
@@ -65,12 +65,12 @@ resource "aws_ecs_task_definition" "task" {
           hostPort      = var.container_port
         }
       ]
-      logConfiguration: {
-        logDriver: "awslogs",
-        options: {
-          awslogs-group: aws_cloudwatch_log_group.webapi_log_group.name,
-          awslogs-region: var.region,
-          awslogs-stream-prefix: "ecs"
+      logConfiguration : {
+        logDriver : "awslogs",
+        options : {
+          awslogs-group : aws_cloudwatch_log_group.webapi_log_group.name,
+          awslogs-region : var.region,
+          awslogs-stream-prefix : "ecs"
         }
       }
     }
@@ -93,7 +93,7 @@ resource "aws_appautoscaling_policy" "ecs_scale_up" {
   service_namespace  = aws_appautoscaling_target.ecs_target.service_namespace
 
   target_tracking_scaling_policy_configuration {
-    target_value       = var.ecs_cpu_scale_up_threshold
+    target_value = var.ecs_cpu_scale_up_threshold
     predefined_metric_specification {
       predefined_metric_type = "ECSServiceAverageCPUUtilization"
     }
@@ -108,7 +108,7 @@ resource "aws_appautoscaling_policy" "ecs_scale_down" {
   service_namespace  = aws_appautoscaling_target.ecs_target.service_namespace
 
   target_tracking_scaling_policy_configuration {
-    target_value       = var.ecs_cpu_scale_down_threshold
+    target_value = var.ecs_cpu_scale_down_threshold
     predefined_metric_specification {
       predefined_metric_type = "ECSServiceAverageCPUUtilization"
     }
@@ -131,9 +131,9 @@ resource "aws_cloudwatch_metric_alarm" "ecs_cpu_high" {
   }
 
   alarm_description = "This alarm fires when CPU utilization exceeds ${var.cpu_utilization_high_threshold} percent"
-  alarm_actions     = [
+  alarm_actions = [
     "arn:aws:application-autoscaling:${var.region}:${data.aws_caller_identity.current.account_id}:scalableTarget/${aws_appautoscaling_target.ecs_target.resource_id}/scalablePolicy/${aws_appautoscaling_policy.ecs_scale_down.name}"
-    ]
+  ]
 }
 
 resource "aws_ecs_service" "service" {
