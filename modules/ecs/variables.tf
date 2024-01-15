@@ -3,6 +3,12 @@ variable "cluster_name" {
   type        = string
 }
 
+variable "region" {
+  description = "AWS region for the ECS service"
+  type        = string
+}
+
+
 variable "task_family" {
   description = "The family of the ECS task"
   type        = string
@@ -50,5 +56,44 @@ variable "security_group_id" {
 
 variable "desired_count" {
   description = "The desired number of instances of the task definition to run"
+  type        = number
+}
+
+variable "alb_security_group_id" {
+  description = "The security group ID for the Application Load Balancer"
+  type        = string
+}
+
+variable "alb_subnets" {
+  description = "The subnets for the Application Load Balancer"
+  type        = list(string)
+}
+
+variable "cpu_utilization_high_threshold" {
+  description = "The CPU utilization percentage to trigger the high CPU alarm"
+  type        = number
+}
+
+variable "network_vpc_id" {
+  description = "The VPC ID where the service is deployed into"
+}
+
+variable "ecs_max_capacity" {
+  description = "Maximum number of tasks for ECS auto-scaling"
+  type        = number
+}
+
+variable "ecs_min_capacity" {
+  description = "Minimum number of tasks for ECS auto-scaling"
+  type        = number
+}
+
+variable "ecs_cpu_scale_up_threshold" {
+  description = "CPU utilization percentage to trigger scale up"
+  type        = number
+}
+
+variable "ecs_cpu_scale_down_threshold" {
+  description = "CPU utilization percentage to trigger scale down"
   type        = number
 }

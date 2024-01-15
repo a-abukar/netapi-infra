@@ -52,3 +52,14 @@ variable "security_group_id" {
   description = "The ID of the VPC security group for the RDS instance"
   type        = string
 }
+
+variable "rds_instance_identifier" {
+  description = "Identifier for the RDS instance"
+  type        = string
+}
+
+variable "rds_cpu_utilization_high_threshold" {
+  description = "The CPU utilization percentage to trigger the high CPU alarm for RDS"
+  type        = number
+}
+

@@ -140,13 +140,37 @@ variable "rds_db_parameter_family" {
   default     = "mysql5.7"
 }
 
-# variable "rds_subnet_ids" {
-#   description = "A list of VPC subnet IDs for the RDS instance"
-#   type        = list(string)
-# }
+variable "ecs_cpu_utilization_high_threshold" {
+  description = "CPU utilization threshold for ECS alarm"
+  type        = number
+}
 
-# variable "rds_security_group_id" {
-#   description = "The ID of the VPC security group for the RDS instance"
-#   type        = string
-# }
+variable "rds_instance_identifier" {
+  description = "Identifier for the RDS instance"
+  type        = string
+}
 
+variable "rds_cpu_utilization_high_threshold" {
+  description = "CPU utilization threshold for RDS alarm"
+  type        = number
+}
+
+variable "ecs_max_capacity" {
+  description = "Maximum number of tasks for ECS auto-scaling"
+  type        = number
+}
+
+variable "ecs_min_capacity" {
+  description = "Minimum number of tasks for ECS auto-scaling"
+  type        = number
+}
+
+variable "ecs_cpu_scale_up_threshold" {
+  description = "CPU utilization percentage to trigger scale up"
+  type        = number
+}
+
+variable "ecs_cpu_scale_down_threshold" {
+  description = "CPU utilization percentage to trigger scale down"
+  type        = number
+}
