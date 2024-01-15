@@ -106,7 +106,7 @@ resource "aws_security_group" "ecs_sg" {
     from_port   = 3306
     to_port     = 3306
     protocol    = "tcp"
-    cidr_blocks = [aws_security_group.alb_sg]
+    cidr_blocks = [aws_security_group.alb_sg.id]
   }
 }
 
