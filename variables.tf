@@ -155,3 +155,22 @@ variable "rds_cpu_utilization_high_threshold" {
   type        = number
 }
 
+variable "ecs_max_capacity" {
+  description = "Maximum number of tasks for ECS auto-scaling"
+  type        = number
+}
+
+variable "ecs_min_capacity" {
+  description = "Minimum number of tasks for ECS auto-scaling"
+  type        = number
+}
+
+variable "ecs_cpu_scale_up_threshold" {
+  description = "CPU utilization percentage to trigger scale up"
+  type        = number
+}
+
+variable "ecs_cpu_scale_down_threshold" {
+  description = "CPU utilization percentage to trigger scale down"
+  type        = number
+}
