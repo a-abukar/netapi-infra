@@ -16,6 +16,31 @@ env:
   AWS_DEFAULT_REGION: 'us-west-2'
 
 jobs:
+  terraform_static_analysis:
+    name: 'Terraform Static Analysis'
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Terraform Format
+        run: |
+          terraform fmt -check
+          if [ $? -ne 0 ]; then
+            exit 1
+          fi
+
+      - name: Terraform Validate
+        run: terraform validate
+
+      - name: Install tflint
+        run: |
+          curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
+          tflint --version
+
+      - name: Terraform Lint
+        run: tflint
   terraform_plan_test:
     name: 'Terraform Plan for Test'
     runs-on: ubuntu-latest
